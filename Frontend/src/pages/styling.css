@@ -3,15 +3,21 @@ body{
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-     background:#222222;
+     background:#565991;
 }
 
 .container{
     flex: 1;
+    background-color: #00D4FF;
+    gap: 1rem;
+    padding: 5rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .navbar{
-    height: 5rem;
+    height: 6rem;
+    width: 100%;
     background-color: whitesmoke;
 }
 
@@ -51,6 +57,7 @@ body{
 .f-info{
     text-align: center;
     height: 8rem;
+    width: 81rem ;
     background-color: #ebebeb;
     display: flex;
     flex-wrap: wrap;
@@ -63,10 +70,10 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap; /* allows wrapping to next line if too many cards */
-  gap: 2rem; /* spacing between cards */
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); /* beautiful gradient */
+  flex-wrap: wrap; 
+  gap: 2rem;
+  min-height: 60vh;
+  background: #565991; 
   background-size: cover;
   padding: 2rem;
 }
@@ -74,8 +81,8 @@ body{
 /* Each card */
 .card {
   border: none;
-  background: rgba(255, 255, 255, 0.15); /* transparent glass style */
-  backdrop-filter: blur(10px); /* glass effect */
+  background: rgba(255, 255, 255, 0.15); 
+  backdrop-filter: blur(10px); 
   border-radius: 15px;
   width: 280px;
   height: 180px;
@@ -99,29 +106,7 @@ body{
   background: rgba(255, 255, 255, 0.25);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
 }
-/*
-.card{
-    border: none !important;
-    margin-bottom: 2rem;
-    background-color:  rgba(0, 0, 0, 0.473) !important;
-    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-     flex-wrap: wrap;
-    gap: 2rem; 
-  min-height: 10vh;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 2rem 3rem;
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-*/
+
 .card-img-overlay{
     opacity: 0;
 }
@@ -150,7 +135,26 @@ body{
     width: 60vh !important;
 }
 
+.role-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  
+}
+
+.role-section label {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.role-section input[type="radio"] {
+  margin-right: 0.4rem;
+  accent-color: #00d4ff;
+}
+
+
 .btns{
     display:flex;
     gap: 1rem;
+    width: 80px;
 }

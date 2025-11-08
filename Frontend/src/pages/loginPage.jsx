@@ -1,4 +1,5 @@
 import LoginForm from "../components/loginForm";
+import "./styling.css";
 
 const LoginPage = () => {
   return (
