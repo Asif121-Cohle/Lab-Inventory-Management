@@ -1,5 +1,5 @@
-import "../pages/styling.css";
-import Footer from "./footer";
+import "../pages/CSS/styling.css";
+
 const Dashboard = () => {
   return (
     <div className="dashboard">
@@ -8,7 +8,6 @@ const Dashboard = () => {
       <div className="card">Physics Lab</div>
       <div className="card">Electronics Lab</div>
     </div>
-    <Footer/>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../pages/styling.css";
+import "../pages/CSS/styling.css";
+
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
@@ -85,6 +86,13 @@ return (
 
       <button className="btns" type="submit" >
       Login</button>
+    
+    <p className="signup-text">
+        Don't have an account?{" "}
+        <span className="signup-link" onClick={() => navigate("/signupForm")}>
+          Sign up
+        </span>
+    </p>
     </form>
   );
 };

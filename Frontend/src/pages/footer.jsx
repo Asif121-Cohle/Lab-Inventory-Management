@@ -1,11 +1,14 @@
 import React from "react";
-import "../pages/styling.css";
+import "./CSS/styling.css";
+import "./CSS/fa.css";
+import "./CSS/header.css";
+import "./CSS/card.css";
 
 const Footer = () => {
   return (
     <footer className="footer">
       <div className="f-info">
-        <div className="f-info-socials">
+        <div className="nav-link f-info-socials">
           <i className="fa-brands fa-square-facebook"></i>
           <i className="fa-brands fa-linkedin"></i>
           <i className="fa-brands fa-square-instagram"></i>
