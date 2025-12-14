@@ -1,10 +1,10 @@
 import SignupForm from "../components/signupForm";
 import "./CSS/styling.css";
+import "./CSS/Blob.css";
 
 const SignupPage = () => {
   return (
-    <div className="login-page">
-
+    <div className="page-wrapper login-page">
       {/* Same animated background */}
       <div className="animated-bg">
         <div className="blob"></div>

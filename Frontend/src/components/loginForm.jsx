@@ -1,6 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { authAPI } from "../services/api";
 import "../pages/CSS/styling.css";
 
 
@@ -9,21 +10,29 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
     
-    navigate("/dashboard");
-   /* try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", { username, password ,role});
-      localStorage.setItem("token", res.data.token);
+    try {
+      const res = await authAPI.login({ username, password, role });
+      
+      // Store user data and token using AuthContext
+      // Use role from response data, not from form state
+      login(res.data.user, res.data.token, res.data.user.role);
+      
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.msg || "Login failed");
+      setError(err.response?.data?.message || err.response?.data?.msg || "Login failed");
+    } finally {
+      setLoading(false);
     }
-   */
   };
 
 return (
@@ -84,8 +93,8 @@ return (
         </label>
       </div>
 
-      <button className="btns" type="submit" >
-      Login</button>
+      <button className="login-btn" type="submit" disabled={loading}>
+      {loading ? "Logging in..." : "Login"}</button>
     
     <p className="signup-text">
         Don't have an account?{" "}

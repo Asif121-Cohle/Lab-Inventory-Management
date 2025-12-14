@@ -1,0 +1,81 @@
+/* ===== GLOBAL BLOB BACKGROUND ===== */
+.animated-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+
+/* Blob wrapper */
+.blob {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  animation: blob-float 20s ease-in-out infinite;
+}
+
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Glow layer */
+
+.blob::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+   background:
+    radial-gradient(
+      circle,
+    rgba(246, 214, 122, 0.95),
+    rgba(246, 214, 122, 0.45),
+    transparent 65%
+    );
+
+    filter: blur(22px);     
+     opacity: 0.95;
+     mix-blend-mode: screen;
+  }/*
+  background: radial-gradient(
+    
+    circle at 30% 30%,
+      rgba(255, 230, 160, 0.85),
+      rgba(246, 214, 122, 0.55) 35%,
+      rgba(246, 214, 122, 0.25) 55%,
+      transparent 68%
+  );
+
+  filter: blur(60px);
+  mix-blend-mode: screen;
+}*/
+
+/* Positions */
+.blob:nth-child(1) {
+  top: -250px;
+  left: -250px;
+}
+
+.blob:nth-child(2) {
+  bottom: -260px;
+  right: -260px;
+  animation-duration: 26s;
+}
+
+.blob:nth-child(3) {
+  top: 65%;
+  left: 5%;
+  animation-duration: 32s;
+}
+
+/* Animation */
+@keyframes blob-float {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(220px, 160px) scale(1.5); }
+  100% { transform: translate(0, 0) scale(1); }
+}

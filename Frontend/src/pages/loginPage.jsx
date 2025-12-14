@@ -1,10 +1,12 @@
 import LoginForm from "../components/loginForm";
+import "./CSS/Blob.css";
 import "./CSS/styling.css";
+
 
 const LoginPage = () => {
   return (
 
-     <div className="login-page">
+    <div className="page-wrapper login-page">
 
       <div className="animated-bg">
        <div className="blob"></div>

@@ -1,0 +1,242 @@
+/* Check Lab Schedule Page Styling */
+.check-schedule-container {
+  min-height: 100vh;
+  background: #1f2937;
+  position: relative;
+  overflow: hidden;
+  padding: 80px 20px 40px;
+}
+
+.check-schedule-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Schedules Calendar */
+.schedules-calendar {
+  margin-top: 30px;
+}
+
+.schedule-day {
+  margin-bottom: 40px;
+}
+
+.day-header {
+  color: #f6d67a;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(246, 214, 122, 0.3);
+}
+
+.day-schedules {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+/* Schedule Card */
+.schedule-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(246, 214, 122, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.schedule-card:hover {
+  border-color: #f6d67a;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(246, 214, 122, 0.2);
+}
+
+.schedule-card.past-schedule {
+  opacity: 0.6;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.schedule-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.schedule-lab-name {
+  color: #f6d67a;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.schedule-time {
+  background: rgba(246, 214, 122, 0.2);
+  color: #f6d67a;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.schedule-card-body {
+  margin-bottom: 15px;
+}
+
+.schedule-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.schedule-info-row strong {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.schedule-info-row span {
+  color: white;
+  font-weight: 500;
+}
+
+.schedule-purpose {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(246, 214, 122, 0.1);
+  border-radius: 8px;
+}
+
+.schedule-purpose strong {
+  color: #f6d67a;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.schedule-purpose p {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Card Actions */
+.schedule-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-edit,
+.btn-cancel {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-edit {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+}
+
+.btn-edit:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-cancel {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 2px solid #ef4444;
+}
+
+.btn-cancel:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.schedule-card-footer {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.read-only-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 6px 14px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  display: inline-block;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: #1c1b1f;
+  border: 2px solid #f6d67a;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.modal-content h2 {
+  color: #f6d67a;
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.btn-danger {
+  flex: 1;
+  padding: 12px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .day-schedules {
+    grid-template-columns: 1fr;
+  }
+}
