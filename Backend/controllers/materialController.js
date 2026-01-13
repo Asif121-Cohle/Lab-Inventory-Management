@@ -17,18 +17,31 @@ const categorizeMaterial = async (name, description) => {
       };
     }
 
-    const prompt = `Classify this lab item into EXACTLY ONE of: [Equipment, Consumable, Chemical, Tool, Electronic Component]. Also suggest 2-4 relevant tags based on the item name and description.
-    
+    const prompt = `You are a lab inventory categorization expert.
+
+TASK 1: Classify the item into EXACTLY ONE category: [Equipment, Consumable, Chemical, Tool, Electronic Component]
+
+TASK 2: Extract 2-5 relevant tags based on KEYWORDS from the description. Tags should be:
+- Specific keywords/phrases extracted from the description
+- Include synonyms or related terms
+- Use hyphenated phrases for multi-word concepts (e.g., "car-motorcycle-battery")
+- Focus on descriptive attributes, materials, purpose, or application areas
+- Be specific and meaningful (not generic)
+
+Example: If description mentions "car, motorcycle, batteries, automotive energy solutions"
+Extract tags like: ["car-motorcycle-battery", "automotive-energy", "power-storage", "vehicle-electronics"]
+
 Item Name: ${name}
 Description: ${description || 'No description provided'}
 
-Respond ONLY with valid JSON:
+Respond ONLY with valid JSON, no markdown or code blocks:
 {
   "category": "one_of_the_five_categories",
-  "tags": ["tag1", "tag2", "tag3"]
+  "tags": ["keyword-phrase-1", "keyword-phrase-2", "keyword-phrase-3"]
 }`;
 
     console.log('🤖 AI Categorization request for:', name);
+    console.log('📋 Description analyzed:', description ? description.substring(0, 100) + '...' : 'None');
     
     const response = await axios.post(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
@@ -61,11 +74,19 @@ Respond ONLY with valid JSON:
         result.category = 'Equipment';
       }
       
-      // Ensure tags is array
+      // Ensure tags is array and has meaningful values
       if (!Array.isArray(result.tags)) {
+        result.tags = ['laboratory-equipment'];
+      } else if (result.tags.length === 0) {
         result.tags = ['laboratory-equipment'];
       }
       
+      // Clean up tags (remove empty strings, convert to lowercase with hyphens)
+      result.tags = result.tags
+        .filter(tag => tag && tag.trim())
+        .map(tag => tag.toLowerCase().trim());
+      
+      console.log('🏷️  Final tags:', result.tags);
       return result;
     }
 
@@ -99,20 +120,76 @@ exports.categorizeMaterialHandler = async (req, res) => {
       return res.status(400).json({ message: 'Material name is required' });
     }
 
-    const result = await categorizeMaterial(name, description);
-    res.json(result);
+    const categorization = await categorizeMaterial(name, description);
+    res.json(categorization);
   } catch (error) {
-    console.error('Categorize material error:', error);
-    res.status(500).json({ message: 'Failed to categorize material' });
+    console.error('Categorization error:', error);
+    res.status(500).json({ message: error.message || 'Failed to categorize material' });
+  }
+};
+
+// @desc    Add material to lab
+// @route   POST /api/materials
+// @access  Private (Lab Assistant only)
+exports.addMaterial = async (req, res) => {
+  try {
+    const { name, description, quantity, labId, category, tags } = req.body;
+
+    // Validation
+    if (!name || !labId) {
+      return res.status(400).json({ message: 'Material name and lab are required' });
+    }
+
+    // Find lab with id field (string-based)
+    const lab = await Lab.findOne({ id: labId });
+    if (!lab) {
+      return res.status(404).json({ message: 'Lab not found' });
+    }
+
+    // Use provided category/tags or generate with AI
+    let finalCategory = category;
+    let finalTags = tags;
+
+    if (!category || !tags || tags.length === 0) {
+      console.log('🤖 Generating AI categorization...');
+      const aiResult = await categorizeMaterial(name, description);
+      finalCategory = aiResult.category;
+      finalTags = aiResult.tags;
+    }
+
+    const material = new Material({
+      name,
+      description,
+      quantity: quantity || 0,
+      lab: lab._id,
+      category: finalCategory,
+      tags: finalTags
+    });
+
+    await material.save();
+
+    await material.populate('lab', 'name');
+
+    res.status(201).json({ 
+      message: 'Material added successfully',
+      material,
+      aiGenerated: !category || !tags
+    });
+  } catch (error) {
+    console.error('Add material error:', error);
+    res.status(500).json({ message: error.message || 'Server error' });
   }
 };
 
 // @desc    Get all materials
 // @route   GET /api/materials
-// @access  Private
+// @access  Public
 exports.getAllMaterials = async (req, res) => {
   try {
-    const materials = await Material.find().populate('lab', 'name').sort({ name: 1 });
+    const materials = await Material.find()
+      .populate('lab', 'name id')
+      .sort({ createdAt: -1 });
+
     res.json({ materials });
   } catch (error) {
     console.error('Get materials error:', error);
@@ -122,11 +199,12 @@ exports.getAllMaterials = async (req, res) => {
 
 // @desc    Get material by ID
 // @route   GET /api/materials/:id
-// @access  Private
+// @access  Public
 exports.getMaterialById = async (req, res) => {
   try {
-    const material = await Material.findById(req.params.id).populate('lab', 'name id');
-    
+    const material = await Material.findById(req.params.id)
+      .populate('lab', 'name id');
+
     if (!material) {
       return res.status(404).json({ message: 'Material not found' });
     }
@@ -138,73 +216,41 @@ exports.getMaterialById = async (req, res) => {
   }
 };
 
-// @desc    Add new material
-// @route   POST /api/materials
-// @access  Private (Lab Assistant only)
-exports.addMaterial = async (req, res) => {
-  try {
-    const { name, description, quantity, labId } = req.body;
-
-    // Validate required fields
-    if (!name || !quantity || !labId) {
-      return res.status(400).json({ message: 'name, quantity, and labId are required' });
-    }
-
-    // Find lab by string id ONLY (avoid ObjectId casting error)
-    // Labs use string IDs like "computer-lab", not MongoDB ObjectIds
-    const lab = await Lab.findOne({ id: labId });
-    if (!lab) {
-      console.error(`❌ Lab not found with id: ${labId}`);
-      return res.status(404).json({ message: `Lab "${labId}" not found` });
-    }
-    
-    console.log(`✓ Found lab: ${lab.name}`);
-
-    // Use AI to categorize and tag
-    const aiResult = await categorizeMaterial(name, description);
-
-    const material = new Material({
-      ...req.body,
-      lab: lab._id,
-      labId: labId,
-      category: aiResult.category,
-      tags: aiResult.tags,
-      aiGenerated: true
-    });
-
-    await material.save();
-
-    // Log the addition
-    await UsageLog.create({
-      material: material._id,
-      quantity,
-      action: 'added',
-      performedBy: req.user._id
-    });
-
-    res.status(201).json({ material });
-  } catch (error) {
-    console.error('Add material error:', error);
-    res.status(500).json({ message: error.message || 'Server error' });
-  }
-};
-
 // @desc    Update material
 // @route   PUT /api/materials/:id
 // @access  Private (Lab Assistant only)
 exports.updateMaterial = async (req, res) => {
   try {
-    const material = await Material.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body, updatedAt: Date.now() },
-      { new: true, runValidators: true }
-    );
+    const { name, description, quantity, category, tags } = req.body;
 
+    const material = await Material.findById(req.params.id);
     if (!material) {
       return res.status(404).json({ message: 'Material not found' });
     }
 
-    res.json({ material });
+    // If any field is being updated, regenerate AI tags if not provided
+    if ((name || description) && (!category || !tags || tags.length === 0)) {
+      console.log('🤖 Regenerating AI categorization for update...');
+      const aiResult = await categorizeMaterial(name || material.name, description || material.description);
+      material.category = aiResult.category;
+      material.tags = aiResult.tags;
+    } else {
+      if (name) material.name = name;
+      if (description) material.description = description;
+      if (category) material.category = category;
+      if (tags) material.tags = tags;
+    }
+
+    if (quantity !== undefined) material.quantity = quantity;
+
+    await material.save();
+
+    await material.populate('lab', 'name id');
+
+    res.json({ 
+      message: 'Material updated successfully',
+      material 
+    });
   } catch (error) {
     console.error('Update material error:', error);
     res.status(500).json({ message: error.message || 'Server error' });
@@ -225,6 +271,101 @@ exports.deleteMaterial = async (req, res) => {
     res.json({ message: 'Material deleted successfully' });
   } catch (error) {
     console.error('Delete material error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Get materials by lab
+// @route   GET /api/labs/:labId/materials
+// @access  Public
+exports.getMaterialsByLab = async (req, res) => {
+  try {
+    const { labId } = req.params;
+
+    // Find lab by ID string
+    const lab = await Lab.findOne({ id: labId });
+    if (!lab) {
+      return res.status(404).json({ message: 'Lab not found' });
+    }
+
+    const materials = await Material.find({ lab: lab._id })
+      .sort({ createdAt: -1 });
+
+    res.json({ materials });
+  } catch (error) {
+    console.error('Get materials by lab error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Log material usage
+// @route   POST /api/materials/:id/usage
+// @access  Private (Student only)
+exports.logMaterialUsage = async (req, res) => {
+  try {
+    const { quantity, purpose } = req.body;
+    const { id } = req.params;
+
+    // Validation
+    if (!quantity || quantity <= 0) {
+      return res.status(400).json({ message: 'Valid quantity is required' });
+    }
+
+    const material = await Material.findById(id);
+    if (!material) {
+      return res.status(404).json({ message: 'Material not found' });
+    }
+
+    if (material.quantity < quantity) {
+      return res.status(400).json({ message: 'Insufficient quantity available' });
+    }
+
+    // Create usage log
+    const usageLog = new UsageLog({
+      material: id,
+      student: req.user._id,
+      quantity,
+      purpose,
+      timestamp: new Date()
+    });
+
+    await usageLog.save();
+
+    // Decrease material quantity
+    material.quantity -= quantity;
+    await material.save();
+
+    res.json({ 
+      message: 'Material usage logged successfully',
+      usageLog,
+      remainingQuantity: material.quantity
+    });
+  } catch (error) {
+    console.error('Log usage error:', error);
+    res.status(500).json({ message: error.message || 'Server error' });
+  }
+};
+
+// @desc    Get usage logs for a material
+// @route   GET /api/materials/:id/usage-logs
+// @access  Private
+exports.getMaterialUsageLogs = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const material = await Material.findById(id);
+    if (!material) {
+      return res.status(404).json({ message: 'Material not found' });
+    }
+
+    const usageLogs = await UsageLog.find({ material: id })
+      .populate('student', 'username email')
+      .populate('material', 'name')
+      .sort({ timestamp: -1 });
+
+    res.json({ usageLogs });
+  } catch (error) {
+    console.error('Get usage logs error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

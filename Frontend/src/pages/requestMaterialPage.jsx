@@ -99,9 +99,9 @@ const RequestMaterialPage = () => {
     <>
       <Header />
       <div className="page-wrapper request-material-container">
-        <div style={{maxWidth: '900px', margin: '0 auto 10px'}}>
+        {/*<div style={{maxWidth: '900px', margin: '0 auto 10px'}}>
           <BackButton />
-        </div>
+        </div> */}
         {/* Animated Background */}
         <div className="animated-bg">
        <div className="blob"></div>

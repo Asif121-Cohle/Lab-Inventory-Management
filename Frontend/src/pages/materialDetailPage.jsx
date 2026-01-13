@@ -165,23 +165,21 @@ const MaterialDetailPage = () => {
                   )}
                 </div>
               )}
-
+              
               {/* Action Buttons based on Role */}
-              <div className="action-buttons">
+              {/*<div className="action-buttons">
                 {role === 'student' && material.quantity > 0 && (
                   <button className="primary-btn" onClick={handleRequestMaterial}>
                     Request This Material
                   </button>
                 )}
-                
-                
-
+              
                 {role === 'student' && material.quantity === 0 && (
                   <button className="disabled-btn" disabled>
                     Currently Unavailable
                   </button>
                 )}
-              </div>
+              </div>*/}
             </div>
           </div>
         </div>

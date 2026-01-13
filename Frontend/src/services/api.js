@@ -32,7 +32,7 @@ API.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('user');
-      // Give a small delay so UI can update
+      // provides a small delay so UI can update
       setTimeout(() => {
         window.location.href = '/login';
       }, 100);
