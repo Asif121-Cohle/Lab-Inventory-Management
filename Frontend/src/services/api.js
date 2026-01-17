@@ -67,6 +67,7 @@ export const materialAPI = {
 
 // Student Request APIs
 export const requestAPI = {
+  aiSuggestMaterials: (projectDescription, labId) => API.post('/requests/ai-suggest', { projectDescription, labId }),
   createRequest: (requestData) => API.post('/requests', requestData),
   getMyRequests: () => API.get('/requests/my-requests'),
   getPendingRequests: () => API.get('/requests/pending'),
