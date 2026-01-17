@@ -60,6 +60,7 @@ export const labAPI = {
 export const materialAPI = {
   getMaterialById: (materialId) => API.get(`/materials/${materialId}`),
   getAllMaterials: () => API.get('/materials'),
+  aiSearchMaterials: (query, labId) => API.post('/materials/search', { query, labId }),
   addMaterial: (materialData) => API.post('/materials', materialData),
   updateMaterial: (materialId, materialData) => API.put(`/materials/${materialId}`, materialData),
   deleteMaterial: (materialId) => API.delete(`/materials/${materialId}`),

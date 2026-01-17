@@ -171,6 +171,24 @@ async function runTests() {
     log.info(`Example: ${data.suggestions[0].name} - ${data.suggestions[0].reason}`);
   })) passed++; else failed++;
 
+  // Test 12: AI Natural Language Search (NEW!)
+  if (await testEndpoint('AI Natural Language Search', async () => {
+    const { data } = await axios.post(
+      `${BASE_URL}/materials/search`,
+      {
+        query: 'Show me all Arduino compatible components',
+        labId: 'electronics-lab'
+      },
+      { 
+        headers: { Authorization: `Bearer ${assistantToken}` },
+        timeout: 60000 // 60 second timeout for AI processing
+      }
+    );
+    if (!data.materials) throw new Error('No materials returned');
+    log.ai(`Found ${data.totalResults} materials${data.aiPowered ? ' (AI-powered)' : ' (keyword fallback)'}`);
+    if (data.intent) log.info(`Intent: ${data.intent}`);
+  })) passed++; else failed++;
+
   // Test 12: Get Pending Requests
   if (await testEndpoint('Get Pending Requests', async () => {
     const { data } = await axios.get(`${BASE_URL}/requests/pending`, {
