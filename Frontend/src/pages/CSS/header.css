@@ -1,0 +1,164 @@
+/* Navbar container */
+.custom-navbar {
+  width: 100vw;      
+  padding-top: 0;
+  padding-left: 0;      
+  padding-right: 0;
+  background: #1f2937;
+  color: #e5e7eb;
+  border-bottom: 3px solid #2563eb; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+}
+
+/* Row alignment */
+.nav-row {
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Left side */
+.brand-icon {
+  font-size: 1.9rem;
+  color: #58a6ff;
+  margin-right: 8px;
+}
+
+.brand-name {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+/* Right side */
+.btns {
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.logout-button {
+  background: #222831;
+  color: #eeeeee;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.logout-button:hover {
+  background: #393e46;
+  color: #60a5fa;
+}
+
+/* Popup dark background */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+}
+
+/* Popup box itself */
+.popup-box {
+  background: #1e1e1e;
+  padding: 30px;
+  width: 350px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+  animation: popupFade 0.25s ease;
+}
+
+/* Popup fade animation */
+@keyframes popupFade {
+  from { transform: scale(0.75); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.popup-box h3 {
+  color: #eeeeee;
+}
+
+.popup-box p {
+  color: #cccccc;
+}
+
+
+/* Buttons inside popup */
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* YES button — elegant dark blue */
+.confirm-btn {
+  background: #30475e;
+  border: none;
+  padding: 10px 15px;
+  width: 48%;
+  color: #eeeeee;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.confirm-btn:hover {
+  background: #3f586f;
+}
+
+/* CANCEL button — soft dark grey */
+.cancel-btn {
+  background: #222831;
+  border: 1px solid #393e46;
+  padding: 10px 15px;
+  width: 48%;
+  color: #eeeeee;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.cancel-btn:hover {
+  background: #393e46;
+}

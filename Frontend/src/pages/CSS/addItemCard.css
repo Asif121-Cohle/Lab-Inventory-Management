@@ -1,0 +1,101 @@
+/* Add Item Card Styling */
+.add-item-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, rgba(246, 214, 122, 0.08), rgba(246, 214, 122, 0.04));
+  border: 2px dashed rgba(246, 214, 122, 0.5);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 250px;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-item-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(246, 214, 122, 0.1), transparent 80%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.add-item-card:hover {
+  border-color: #f6d67a;
+  background: linear-gradient(135deg, rgba(246, 214, 122, 0.12), rgba(246, 214, 122, 0.06));
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(246, 214, 122, 0.2);
+}
+
+.add-item-card:hover::before {
+  opacity: 1;
+}
+
+.add-item-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(246, 214, 122, 0.1);
+  border-radius: 50%;
+  color: #f6d67a;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  font-size: 2.5rem;
+}
+
+.add-item-card:hover .add-item-icon {
+  background: rgba(246, 214, 122, 0.2);
+  transform: scale(1.1) rotate(10deg);
+}
+
+.add-item-card h3 {
+  color: #f6d67a;
+  font-size: 1.3rem;
+  margin: 10px 0 5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.add-item-card p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+}
+
+.add-item-card:active {
+  transform: translateY(-3px);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .add-item-card {
+    padding: 20px 15px;
+    min-height: 200px;
+  }
+
+  .add-item-icon {
+    width: 65px;
+    height: 65px;
+    font-size: 2rem;
+  }
+
+  .add-item-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .add-item-card p {
+    font-size: 0.8rem;
+  }
+}
