@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LabProvider } from "./context/LabContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ChatBot from "./components/ChatBot";
 
 // Pages
 import LoginPage from "./pages/loginPage";
@@ -20,6 +21,12 @@ import CheckLabSchedulePage from "./pages/checkLabSchedulePage";
 
 // Lab Assistant Pages
 import ApproveRequestsPage from "./pages/approveRequestsPage";
+
+// Authenticated ChatBot Wrapper
+const AuthenticatedChatBot = () => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <ChatBot /> : null;
+};
 
 function App() {
   return (
@@ -104,6 +111,9 @@ function App() {
               }
             />
           </Routes>
+          
+          {/* AI Chat Assistant - Only available when authenticated */}
+          <AuthenticatedChatBot />
         </Router>
       </LabProvider>
     </AuthProvider>

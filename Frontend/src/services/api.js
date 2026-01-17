@@ -88,4 +88,10 @@ export const scheduleAPI = {
   }),
 };
 
+// Chat APIs
+export const chatAPI = {
+  sendMessage: (message, conversationHistory = []) => API.post('/chat', { message, conversationHistory }),
+  getSuggestions: () => API.get('/chat/suggestions'),
+};
+
 export default API;

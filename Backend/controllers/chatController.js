@@ -35,10 +35,18 @@ exports.chat = async (req, res) => {
     ).join('\n');
 
     // Build conversation history
+    // Separate user and assistant messages for better context
     let historyText = '';
     if (conversationHistory.length > 0) {
+      const userMsgs = conversationHistory.filter(msg => msg.role === 'user').slice(-4);
+      const assistantMsgs = conversationHistory.filter(msg => msg.role === 'assistant').slice(-2);
+      
+      // Combine and maintain chronological order
+      const allMessages = [...userMsgs, ...assistantMsgs]
+        .sort((a, b) => conversationHistory.indexOf(a) - conversationHistory.indexOf(b));
+      
       historyText = '\n\nPREVIOUS CONVERSATION:\n' + 
-        conversationHistory.slice(-4).map(msg => 
+        allMessages.map(msg => 
           `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
         ).join('\n');
     }
