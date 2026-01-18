@@ -156,40 +156,7 @@ async function runTests() {
     log.info(`Request created for: ${data.request.material.name}`);
   })) passed++; else failed++;
 
-  // Test 11: AI Material Suggestion (NEW!)
-  if (await testEndpoint('AI Material Suggestion', async () => {
-    const { data } = await axios.post(
-      `${BASE_URL}/requests/ai-suggest`,
-      {
-        projectDescription: 'I need to build a simple LED circuit with Arduino for my electronics project',
-        labId: 'electronics-lab'
-      },
-      { headers: { Authorization: `Bearer ${studentToken}` } }
-    );
-    if (!data.suggestions || data.suggestions.length === 0) throw new Error('No suggestions returned');
-    log.ai(`AI suggested ${data.suggestions.length} materials`);
-    log.info(`Example: ${data.suggestions[0].name} - ${data.suggestions[0].reason}`);
-  })) passed++; else failed++;
-
-  // Test 12: AI Natural Language Search (NEW!)
-  if (await testEndpoint('AI Natural Language Search', async () => {
-    const { data } = await axios.post(
-      `${BASE_URL}/materials/search`,
-      {
-        query: 'Show me all Arduino compatible components',
-        labId: 'electronics-lab'
-      },
-      { 
-        headers: { Authorization: `Bearer ${assistantToken}` },
-        timeout: 60000 // 60 second timeout for AI processing
-      }
-    );
-    if (!data.materials) throw new Error('No materials returned');
-    log.ai(`Found ${data.totalResults} materials${data.aiPowered ? ' (AI-powered)' : ' (keyword fallback)'}`);
-    if (data.intent) log.info(`Intent: ${data.intent}`);
-  })) passed++; else failed++;
-
-  // Test 12: Get Pending Requests
+  // Test 11: Get Pending Requests
   if (await testEndpoint('Get Pending Requests', async () => {
     const { data } = await axios.get(`${BASE_URL}/requests/pending`, {
       headers: { Authorization: `Bearer ${assistantToken}` }
@@ -197,16 +164,13 @@ async function runTests() {
     log.info(`Pending requests: ${data.requests.length}`);
   })) passed++; else failed++;
 
-  // Test 13: Professor Schedule Lab
+  // Test 12: Professor Schedule Lab
   if (await testEndpoint('Professor Schedule Lab', async () => {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 7);
-    const dateStr = futureDate.toISOString().split('T')[0];
     const { data } = await axios.post(
       `${BASE_URL}/schedules`,
       {
         labId: 'physics-lab',
-        date: dateStr,
+        date: '2026-01-25',
         startTime: '14:00',
         endTime: '16:00',
         courseName: 'Physics 101',

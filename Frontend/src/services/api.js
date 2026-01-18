@@ -60,7 +60,6 @@ export const labAPI = {
 export const materialAPI = {
   getMaterialById: (materialId) => API.get(`/materials/${materialId}`),
   getAllMaterials: () => API.get('/materials'),
-  aiSearchMaterials: (query, labId) => API.post('/materials/search', { query, labId }),
   addMaterial: (materialData) => API.post('/materials', materialData),
   updateMaterial: (materialId, materialData) => API.put(`/materials/${materialId}`, materialData),
   deleteMaterial: (materialId) => API.delete(`/materials/${materialId}`),
@@ -68,7 +67,6 @@ export const materialAPI = {
 
 // Student Request APIs
 export const requestAPI = {
-  aiSuggestMaterials: (projectDescription, labId) => API.post('/requests/ai-suggest', { projectDescription, labId }),
   createRequest: (requestData) => API.post('/requests', requestData),
   getMyRequests: () => API.get('/requests/my-requests'),
   getPendingRequests: () => API.get('/requests/pending'),
@@ -86,18 +84,6 @@ export const scheduleAPI = {
   checkAvailability: (labId, date, time) => API.get(`/schedules/check-availability`, {
     params: { labId, date, time }
   }),
-};
-
-// Chat APIs
-export const chatAPI = {
-  sendMessage: (message, conversationHistory = []) => API.post('/chat', { message, conversationHistory }),
-  getSuggestions: () => API.get('/chat/suggestions'),
-};
-
-// Analytics APIs
-export const analyticsAPI = {
-  generateSummary: () => API.post('/analytics/generate-summary'),
-  getAnalyticsData: () => API.get('/analytics/data'),
 };
 
 export default API;

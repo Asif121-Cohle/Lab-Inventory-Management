@@ -47,7 +47,6 @@ const Header = () => {
             {/* Student Options */}
             {role === "student" && (
               <>
-                <Link to="/analytics" className="nav-link">Analytics</Link>
                 <Link to="/request-material" className="nav-link">Request Material</Link>
                 <Link to="/request-status" className="nav-link">Request Status</Link>
               </>
@@ -56,7 +55,6 @@ const Header = () => {
             {/* Professor Options */}
             {role === "professor" && (
               <>
-                <Link to="/analytics" className="nav-link">Analytics</Link>
                 <Link to="/schedule-lab" className="nav-link">Schedule Lab </Link>
                 <Link to="/lab-schedule" className="nav-link"> Check Lab Schedule</Link>
               </>
@@ -65,7 +63,6 @@ const Header = () => {
             {/* Lab Assistant Options */}
             {role === "lab_assistant" && (
               <>
-                <Link to="/analytics" className="nav-link">Analytics</Link>
                 <Link to="/approve-request" className="nav-link">Approve Requests </Link>
                 <Link to="/lab-schedule" className="nav-link"> Check Lab Schedule</Link>
               </>

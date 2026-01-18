@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import { LabProvider } from "./context/LabContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ChatBot from "./components/ChatBot";
 
 // Pages
 import LoginPage from "./pages/loginPage";
@@ -10,7 +9,6 @@ import SignupPage from "./pages/signupPage";
 import DashboardPage from "./pages/dashboardPage";
 import LabDetailPage from "./pages/labDetailPage";
 import MaterialDetailPage from "./pages/materialDetailPage";
-import AnalyticsPage from "./pages/analyticsPage";
 
 // Student Pages
 import RequestMaterialPage from "./pages/requestMaterialPage";
@@ -22,12 +20,6 @@ import CheckLabSchedulePage from "./pages/checkLabSchedulePage";
 
 // Lab Assistant Pages
 import ApproveRequestsPage from "./pages/approveRequestsPage";
-
-// Authenticated ChatBot Wrapper
-const AuthenticatedChatBot = () => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <ChatBot /> : null;
-};
 
 function App() {
   return (
@@ -62,14 +54,6 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MaterialDetailPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                <ProtectedRoute>
-                  <AnalyticsPage />
                 </ProtectedRoute>
               }
             />
@@ -120,9 +104,6 @@ function App() {
               }
             />
           </Routes>
-          
-          {/* AI Chat Assistant - Only available when authenticated */}
-          <AuthenticatedChatBot />
         </Router>
       </LabProvider>
     </AuthProvider>

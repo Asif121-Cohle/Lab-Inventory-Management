@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLab } from '../context/LabContext';
 import { useAuth } from '../context/AuthContext';
 import Header from './header';
+import BackButton from '../components/BackButton';
 import Footer from './footer';
 import './CSS/materialDetail.css';
+import './CSS/Blob.css';
 
 const MaterialDetailPage = () => {
   const { materialId } = useParams();
@@ -32,19 +34,21 @@ const MaterialDetailPage = () => {
     navigate('/request-material', { state: { materialId, materialName: material.name } });
   };
 
-  const getStockStatus = (quantity, minThreshold = 0) => {
-    if (quantity === 0) return { text: 'Out of Stock', class: 'status-out', icon: '❌' };
-    if (quantity <= minThreshold) return { text: 'Low Stock', class: 'status-low', icon: '⚠️' };
-    return { text: 'In Stock', class: 'status-in', icon: '✅' };
+  
+
+  const getStockStatus = (quantity) => {
+    if (quantity === 0) return { text: 'Out of Stock', class: 'out-of-stock' };
+    if (quantity < 10) return { text: 'Low Stock', class: 'low-stock' };
+    return { text: 'In Stock', class: 'in-stock' };
   };
 
   if (loading) {
     return (
       <>
         <Header />
-        <div className="material-detail-page">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
+        <div className="material-detail-container">
+          <div className="loading-state">
+            <div className="spinner"></div>
             <p>Loading material details...</p>
           </div>
         </div>
@@ -57,13 +61,10 @@ const MaterialDetailPage = () => {
     return (
       <>
         <Header />
-        <div className="material-detail-page">
-          <div className="error-container">
-            <div className="error-icon">⚠️</div>
-            <h2>{error || 'Material not found'}</h2>
-            <button onClick={() => navigate(-1)} className="back-button">
-              ← Go Back
-            </button>
+        <div className="material-detail-container">
+          <div className="error-message">
+            <p>⚠️ {error || 'Material not found'}</p>
+            <button onClick={() => navigate(-1)} className="back-btn">Go Back</button>
           </div>
         </div>
         <Footer />
@@ -71,174 +72,114 @@ const MaterialDetailPage = () => {
     );
   }
 
-  const stockStatus = getStockStatus(material.quantity, material.minThreshold);
+  const stockStatus = getStockStatus(material.quantity);
 
   return (
     <>
       <Header />
-      <div className="material-detail-page">
-        {/* Hero Section */}
-        <div className="material-hero">
-          <button className="back-floating-btn" onClick={() => navigate(-1)}>
+      <div className="page-wrapper material-detail-container">
+          
+        {/* Animated Background */}
+      <div className="animated-bg">
+        <div className="blob"></div>
+        <div className="blob"></div>
+        <div className="blob"></div>
+      </div>
+
+        <div className="material-detail-content">
+          <button className="back-btn" onClick={() => navigate(-1)}>
             ← Back
           </button>
-          
-          <div className="hero-content">
-            <div className="hero-left">
-              <div className="material-icon-container">
-                {material.image ? (
-                  <img src={material.image} alt={material.name} className="material-hero-image" />
-                ) : (
-                  <div className="material-hero-icon">
-                    {material.category === 'Electronic Component' ? '🔌' :
-                     material.category === 'Equipment' ? '🔧' :
-                     material.category === 'Chemical' ? '🧪' :
-                     material.category === 'Tool' ? '🛠️' :
-                     material.category === 'Consumable' ? '📦' : '⚙️'}
-                  </div>
-                )}
-              </div>
+
+          <div className="material-detail-grid">
+            {/* Left Column - Image */}
+            <div className="material-image-section">
+              {material.image ? (
+                <img src={material.image} alt={material.name} className="material-detail-image" />
+              ) : (
+                <div className="material-detail-placeholder">📦</div>
+              )}
             </div>
 
-            <div className="hero-right">
-              <div className="material-header">
-                <h1 className="material-title">{material.name}</h1>
-                <div className={`stock-badge ${stockStatus.class}`}>
-                  <span className="badge-icon">{stockStatus.icon}</span>
-                  <span className="badge-text">{stockStatus.text}</span>
-                </div>
+            {/* Right Column - Details */}
+            <div className="material-info-section">
+              <h1 className="material-detail-title">{material.name}</h1>
+              
+              <div className="material-meta">
+                <span className={`stock-status ${stockStatus.class}`}>
+                  {stockStatus.text}
+                </span>
+                <span className="quantity-info">Quantity: {material.quantity}</span>
               </div>
 
-              <div className="material-meta-row">
-                {material.category && (
-                  <div className="meta-item">
-                    <span className="meta-label">Category</span>
-                    <span className="meta-value category-pill">{material.category}</span>
+              {material.category && (
+                <div className="category-section">
+                  <h3>Category</h3>
+                  <span className="category-badge-large">{material.category}</span>
+                </div>
+              )}
+
+              <div className="description-section">
+                <h3>Description</h3>
+                <p>{material.description || 'No description available'}</p>
+              </div>
+
+              {material.specifications && (
+                <div className="specifications-section">
+                  <h3>Specifications</h3>
+                  <ul>
+                    {Object.entries(material.specifications).map(([key, value]) => (
+                      <li key={key}>
+                        <strong>{key}:</strong> {value}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {material.tags && material.tags.length > 0 && (
+                <div className="tags-section">
+                  <h3>AI-Generated Tags</h3>
+                  <div className="tags-list">
+                    {material.tags.map((tag, index) => (
+                      <span key={index} className="tag-large">{tag}</span>
+                    ))}
                   </div>
-                )}
-                <div className="meta-item">
-                  <span className="meta-label">Lab Location</span>
-                  <span className="meta-value">{material.lab?.name || 'N/A'}</span>
                 </div>
-              </div>
+              )}
 
-              <div className="quantity-display">
-                <div className="quantity-box">
-                  <span className="quantity-label">Available</span>
-                  <span className="quantity-number">{material.quantity}</span>
-                  <span className="quantity-unit">units</span>
+              {material.lastRestockDate && (
+                <div className="restock-info">
+                  <p>Last Restocked: {new Date(material.lastRestockDate).toLocaleDateString()}</p>
                 </div>
-                {material.minThreshold > 0 && (
-                  <div className="threshold-box">
-                    <span className="threshold-label">Min. Threshold</span>
-                    <span className="threshold-number">{material.minThreshold}</span>
-                  </div>
-                )}
-              </div>
+              )}
 
-              {role === 'student' && (
-                <div className="action-section">
-                  {material.quantity > 0 ? (
-                    <button className="request-button" onClick={handleRequestMaterial}>
-                      <span className="btn-icon">📋</span>
-                      Request This Material
-                    </button>
-                  ) : (
-                    <button className="request-button disabled" disabled>
-                      <span className="btn-icon">🚫</span>
-                      Currently Unavailable
-                    </button>
+              {material.usageStats && (
+                <div className="usage-stats">
+                  <h3>Usage Statistics</h3>
+                  <p>Average Weekly Usage: {material.usageStats.weeklyAverage || 0} units</p>
+                  {material.usageStats.projectedDepletion && (
+                    <p className="depletion-warning">
+                      ⚠️ Projected depletion in {material.usageStats.projectedDepletion} days
+                    </p>
                   )}
                 </div>
               )}
-            </div>
-          </div>
-        </div>
-
-        {/* Details Section */}
-        <div className="material-details-container">
-          <div className="details-grid">
-            {/* Description Card */}
-            <div className="detail-card description-card">
-              <div className="card-header">
-                <span className="card-icon">📝</span>
-                <h2>Description</h2>
-              </div>
-              <div className="card-body">
-                <p>{material.description || 'No description available for this material.'}</p>
-              </div>
-            </div>
-
-            {/* Tags Card */}
-            {material.tags && material.tags.length > 0 && (
-              <div className="detail-card tags-card">
-                <div className="card-header">
-                  <span className="card-icon">🏷️</span>
-                  <h2>Tags</h2>
-                  {material.aiGenerated && (
-                    <span className="ai-badge">AI Generated</span>
-                  )}
-                </div>
-                <div className="card-body">
-                  <div className="tags-grid">
-                    {material.tags.map((tag, index) => (
-                      <span key={index} className="tag-chip">{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Specifications Card */}
-            {material.specifications && Object.keys(material.specifications).length > 0 && (
-              <div className="detail-card specs-card">
-                <div className="card-header">
-                  <span className="card-icon">⚙️</span>
-                  <h2>Specifications</h2>
-                </div>
-                <div className="card-body">
-                  <div className="specs-list">
-                    {Object.entries(material.specifications).map(([key, value]) => (
-                      <div key={key} className="spec-item">
-                        <span className="spec-key">{key}</span>
-                        <span className="spec-value">{value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Additional Info Card */}
-            <div className="detail-card info-card">
-              <div className="card-header">
-                <span className="card-icon">ℹ️</span>
-                <h2>Additional Information</h2>
-              </div>
-              <div className="card-body">
-                <div className="info-list">
-                  {material.lastRestockDate && (
-                    <div className="info-item">
-                      <span className="info-label">Last Restocked</span>
-                      <span className="info-value">
-                        {new Date(material.lastRestockDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
-                  <div className="info-item">
-                    <span className="info-label">Material ID</span>
-                    <span className="info-value monospace">{material._id}</span>
-                  </div>
-                  {material.createdAt && (
-                    <div className="info-item">
-                      <span className="info-label">Added On</span>
-                      <span className="info-value">
-                        {new Date(material.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
+              
+              {/* Action Buttons based on Role */}
+              {/*<div className="action-buttons">
+                {role === 'student' && material.quantity > 0 && (
+                  <button className="primary-btn" onClick={handleRequestMaterial}>
+                    Request This Material
+                  </button>
+                )}
+              
+                {role === 'student' && material.quantity === 0 && (
+                  <button className="disabled-btn" disabled>
+                    Currently Unavailable
+                  </button>
+                )}
+              </div>*/}
             </div>
           </div>
         </div>

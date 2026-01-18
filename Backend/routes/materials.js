@@ -9,7 +9,6 @@ router.use(auth);
 router.get('/', materialController.getAllMaterials);
 
 // Lab assistant only - must be before /:id to avoid conflicts
-router.post('/search', materialController.aiSearchMaterials);
 router.post('/categorize', authorize('lab_assistant'), materialController.categorizeMaterialHandler);
 router.post('/', authorize('lab_assistant'), materialController.addMaterial);
 router.put('/:id', authorize('lab_assistant'), materialController.updateMaterial);

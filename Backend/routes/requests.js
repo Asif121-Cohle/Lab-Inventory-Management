@@ -7,7 +7,6 @@ const { auth, authorize } = require('../middleware/auth');
 router.use(auth);
 
 // Student routes
-router.post('/ai-suggest', authorize('student'), requestController.aiSuggestMaterials);
 router.post('/', authorize('student'), requestController.createRequest);
 router.get('/my-requests', authorize('student'), requestController.getMyRequests);
 

@@ -1,19 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineSearch, AiOutlineClose } from 'react-icons/ai';
-import { materialAPI } from '../services/api';
 import './CSS/materialsSearch.css';
 
-const MaterialsSearch = ({ materials, onFilter, categories = [], labId }) => {
+const MaterialsSearch = ({ materials, onFilter, categories = [] }) => {
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [allTags, setAllTags] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
-  
-  // AI Search state
-  const [aiMode, setAiMode] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiIntent, setAiIntent] = useState('');
 
   // Extract all unique tags from materials
   useEffect(() => {
@@ -28,11 +22,6 @@ const MaterialsSearch = ({ materials, onFilter, categories = [], labId }) => {
 
   // Apply filtering
   useEffect(() => {
-    // If AI mode is active, don't use local filtering at all
-    if (aiMode) {
-      return;
-    }
-
     let filtered = materials;
 
     // Text search (name + description)
@@ -58,75 +47,7 @@ const MaterialsSearch = ({ materials, onFilter, categories = [], labId }) => {
     }
 
     onFilter(filtered);
-  }, [searchText, selectedCategory, selectedTags, materials, onFilter, aiMode]);
-
-  // AI Search with debounce
-  const handleAiSearch = useCallback(async (query) => {
-    if (!query || query.trim().length < 3) {
-      onFilter(materials);
-      setAiIntent('');
-      return;
-    }
-
-    setAiLoading(true);
-    setAiIntent('');
-
-    try {
-      const { data } = await materialAPI.aiSearchMaterials(query, labId);
-      
-      onFilter(data.materials);
-      
-      if (data.aiPowered && data.intent) {
-        setAiIntent(data.intent);
-      }
-
-      // Apply suggested filters if available
-      if (data.filters?.categories?.length > 0) {
-        setSelectedCategory(data.filters.categories[0]);
-      }
-      if (data.filters?.tags?.length > 0) {
-        setSelectedTags(data.filters.tags.slice(0, 3));
-      }
-
-    } catch (error) {
-      console.error('AI search failed:', error);
-      // Fallback to local search
-      const query = searchText.toLowerCase();
-      const filtered = materials.filter(material =>
-        (material.name && material.name.toLowerCase().includes(query)) ||
-        (material.description && material.description.toLowerCase().includes(query))
-      );
-      onFilter(filtered);
-    } finally {
-      setAiLoading(false);
-    }
-  }, [materials, onFilter, labId, searchText]);
-
-  const handleSearchChange = (e) => {
-    setSearchText(e.target.value);
-    setAiIntent('');
-  };
-
-  const handleSearchSubmit = () => {
-    if (aiMode && searchText.trim().length >= 3) {
-      handleAiSearch(searchText);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearchSubmit();
-    }
-  };
-
-  const toggleAiMode = () => {
-    setAiMode(!aiMode);
-    setAiIntent('');
-    if (aiMode) {
-      // Switching back to manual mode - reset to all materials
-      onFilter(materials);
-    }
-  };
+  }, [searchText, selectedCategory, selectedTags, materials, onFilter]);
 
   const handleTagToggle = (tag) => {
     setSelectedTags(prev =>
@@ -146,62 +67,26 @@ const MaterialsSearch = ({ materials, onFilter, categories = [], labId }) => {
 
   return (
     <div className="materials-search-container">
-      {/* AI Mode Toggle */}
-      <div className="ai-mode-toggle-container">
-        <button
-          className={`ai-mode-btn ${aiMode ? 'active' : ''}`}
-          onClick={toggleAiMode}
-          title={aiMode ? 'Switch to manual search' : 'Switch to AI search'}
-        >
-          {aiMode ? '✨ AI Search' : '🔍 Manual Search'}
-        </button>
-      </div>
-
       {/* Search Bar */}
-      <div className={`search-bar ${aiMode ? 'ai-mode' : ''} ${aiLoading ? 'loading' : ''}`}>
+      <div className="search-bar">
         <AiOutlineSearch className="search-icon" />
         <input
           type="text"
-          placeholder={aiMode 
-            ? 'Ask me anything: "Show Arduino components" or "capacitors above 100μF"... (Press Enter or click search)' 
-            : 'Search by name, description...'
-          }
+          placeholder="Search by name, description..."
           value={searchText}
-          onChange={handleSearchChange}
-          onKeyPress={handleKeyPress}
+          onChange={(e) => setSearchText(e.target.value)}
           className="search-input"
         />
-        {aiMode && searchText.trim().length >= 3 && !aiLoading && (
-          <button
-            className="search-submit-btn"
-            onClick={handleSearchSubmit}
-            title="Search with AI"
-          >
-            <AiOutlineSearch />
-          </button>
-        )}
-        {aiLoading && <div className="search-spinner"></div>}
-        {searchText && !aiLoading && (
+        {searchText && (
           <button
             className="clear-btn"
-            onClick={() => {
-              setSearchText('');
-              setAiIntent('');
-              onFilter(materials);
-            }}
+            onClick={() => setSearchText('')}
             title="Clear search"
           >
             <AiOutlineClose />
           </button>
         )}
       </div>
-
-      {/* AI Intent Display */}
-      {aiMode && aiIntent && (
-        <div className="ai-intent-badge">
-          💡 {aiIntent}
-        </div>
-      )}
 
       {/* Filter Toggle Button */}
       <button

@@ -29,8 +29,6 @@ app.use('/api/labs', require('./routes/labs'));
 app.use('/api/materials', require('./routes/materials'));
 app.use('/api/requests', require('./routes/requests'));
 app.use('/api/schedules', require('./routes/schedules'));
-app.use('/api/chat', require('./routes/chat'));
-app.use('/api/analytics', require('./routes/analytics'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -52,8 +50,6 @@ app.get('/', (req, res) => {
       materials: '/api/materials',
       requests: '/api/requests',
       schedules: '/api/schedules',
-      chat: '/api/chat',
-      analytics: '/api/analytics',
       health: '/api/health'
     }
   });
@@ -74,7 +70,7 @@ app.use((req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📡 API available at http://localhost:${PORT}`);

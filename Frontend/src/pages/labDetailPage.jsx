@@ -100,7 +100,6 @@ const LabDetailPage = () => {
               <MaterialsSearch 
                 materials={materials}
                 onFilter={handleFilterChange}
-                labId={labId}
               />
               
               <div className="materials-grid">
