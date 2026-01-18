@@ -88,14 +88,36 @@ const DashboardPage = () => {
         {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-content">
+            <div className="hero-badge">
+              🚀 Next-Gen Laboratory Management
+            </div>
             <h1 className="hero-title">
-              Welcome to Lab Inventory
-              <span className="gradient-text"> Management System</span>
+              Transform Your Laboratory with
+              <span className="gradient-text"> Intelligent Inventory</span>
             </h1>
             <p className="hero-subtitle">
-              Streamline your laboratory operations with intelligent inventory tracking,
-              AI-powered assistance, and real-time collaboration.
+              Experience the future of lab management with AI-powered inventory tracking, 
+              real-time analytics, and seamless collaboration. Maximize efficiency, minimize waste, 
+              and keep your research flowing without interruption.
             </p>
+            <div className="hero-features">
+              <div className="hero-feature">
+                <span className="feature-icon">⚡</span>
+                <span className="feature-text">Real-time Tracking</span>
+              </div>
+              <div className="hero-feature">
+                <span className="feature-icon">🤖</span>
+                <span className="feature-text">AI Assistant</span>
+              </div>
+              <div className="hero-feature">
+                <span className="feature-icon">📊</span>
+                <span className="feature-text">Smart Analytics</span>
+              </div>
+              <div className="hero-feature">
+                <span className="feature-icon">🔔</span>
+                <span className="feature-text">Low Stock Alerts</span>
+              </div>
+            </div>
             <div className="hero-actions">
               <button className="btn-primary" onClick={() => navigate('/request-material')}>
                 🔍 Browse Materials

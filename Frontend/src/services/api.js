@@ -94,4 +94,10 @@ export const chatAPI = {
   getSuggestions: () => API.get('/chat/suggestions'),
 };
 
+// Analytics APIs
+export const analyticsAPI = {
+  generateSummary: () => API.post('/analytics/generate-summary'),
+  getAnalyticsData: () => API.get('/analytics/data'),
+};
+
 export default API;

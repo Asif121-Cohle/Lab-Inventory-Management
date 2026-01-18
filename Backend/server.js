@@ -30,6 +30,7 @@ app.use('/api/materials', require('./routes/materials'));
 app.use('/api/requests', require('./routes/requests'));
 app.use('/api/schedules', require('./routes/schedules'));
 app.use('/api/chat', require('./routes/chat'));
+app.use('/api/analytics', require('./routes/analytics'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -52,6 +53,7 @@ app.get('/', (req, res) => {
       requests: '/api/requests',
       schedules: '/api/schedules',
       chat: '/api/chat',
+      analytics: '/api/analytics',
       health: '/api/health'
     }
   });
