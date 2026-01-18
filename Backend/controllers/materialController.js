@@ -1,7 +1,7 @@
 const Material = require('../models/Material');
 const Lab = require('../models/Lab');
 const UsageLog = require('../models/UsageLog');
-const axios = require('axios');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // AI Categorization using Google Gemini API
 const categorizeMaterial = async (name, description) => {
@@ -43,51 +43,44 @@ Respond ONLY with valid JSON, no markdown or code blocks:
     console.log('🤖 AI Categorization request for:', name);
     console.log('📋 Description analyzed:', description ? description.substring(0, 100) + '...' : 'None');
     
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-      {
-        contents: [{
-          parts: [{ text: prompt }]
-        }]
-      },
-      { timeout: 10000 }
-    );
-
-    if (!response.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      console.error('❌ Invalid Gemini response structure');
-      throw new Error('Invalid API response structure');
-    }
-
-    const text = response.data.candidates[0].content.parts[0].text;
+    // Initialize Gemini AI
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    
+    // Generate content (non-streaming)
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+    
     console.log('📝 Gemini response:', text.substring(0, 200));
     
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     
     if (jsonMatch) {
-      const result = JSON.parse(jsonMatch[0]);
-      console.log('✅ Parsed category:', result.category, 'Tags:', result.tags);
+      const parsedResult = JSON.parse(jsonMatch[0]);
+      console.log('✅ Parsed category:', parsedResult.category, 'Tags:', parsedResult.tags);
       
       // Validate category is one of allowed values
       const validCategories = ['Equipment', 'Consumable', 'Chemical', 'Tool', 'Electronic Component'];
-      if (!validCategories.includes(result.category)) {
-        console.warn(`⚠️  Invalid category "${result.category}", using "Equipment"`);
-        result.category = 'Equipment';
+      if (!validCategories.includes(parsedResult.category)) {
+        console.warn(`⚠️  Invalid category "${parsedResult.category}", using "Equipment"`);
+        parsedResult.category = 'Equipment';
       }
       
       // Ensure tags is array and has meaningful values
-      if (!Array.isArray(result.tags)) {
-        result.tags = ['laboratory-equipment'];
-      } else if (result.tags.length === 0) {
-        result.tags = ['laboratory-equipment'];
+      if (!Array.isArray(parsedResult.tags)) {
+        parsedResult.tags = ['laboratory-equipment'];
+      } else if (parsedResult.tags.length === 0) {
+        parsedResult.tags = ['laboratory-equipment'];
       }
       
       // Clean up tags (remove empty strings, convert to lowercase with hyphens)
-      result.tags = result.tags
+      parsedResult.tags = parsedResult.tags
         .filter(tag => tag && tag.trim())
         .map(tag => tag.toLowerCase().trim());
       
-      console.log('🏷️  Final tags:', result.tags);
-      return result;
+      console.log('🏷️  Final tags:', parsedResult.tags);
+      return parsedResult;
     }
 
     console.error('❌ Could not parse JSON from Gemini response');
@@ -97,10 +90,10 @@ Respond ONLY with valid JSON, no markdown or code blocks:
     };
   } catch (error) {
     console.error('❌ Gemini API Error:', error.message);
-    if (error.response?.status === 401) {
+    if (error.message?.includes('API_KEY')) {
       console.error('🔑 Invalid API key - check GEMINI_API_KEY');
-    } else if (error.response?.status === 429) {
-      console.error('⏱️  Rate limited');
+    } else if (error.message?.includes('quota')) {
+      console.error('⏱️  Rate limited or quota exceeded');
     }
     return {
       category: 'Equipment',
@@ -162,6 +155,7 @@ exports.addMaterial = async (req, res) => {
       description,
       quantity: quantity || 0,
       lab: lab._id,
+      labId: lab.id,
       category: finalCategory,
       tags: finalTags
     });

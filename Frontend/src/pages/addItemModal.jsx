@@ -36,7 +36,7 @@ const AddItemModal = ({ labId, onClose, onSuccess }) => {
 
     try {
       // Call backend API to use Gemini for categorization
-      const response = await fetch('http://localhost:5000/api/materials/categorize', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/materials/categorize`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
