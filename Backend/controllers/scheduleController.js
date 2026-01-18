@@ -8,8 +8,8 @@ exports.createSchedule = async (req, res) => {
   try {
     const { labId, date, startTime, endTime, timeSlot, courseName, className, expectedStudents, purpose } = req.body;
 
-    // Find lab
-    const lab = await Lab.findOne({ $or: [{ _id: labId }, { id: labId }] });
+    // Find lab by string id field (not ObjectId)
+    const lab = await Lab.findOne({ id: labId });
     if (!lab) {
       return res.status(404).json({ message: 'Lab not found' });
     }
@@ -171,8 +171,8 @@ exports.checkAvailability = async (req, res) => {
       return res.status(400).json({ message: 'Lab ID, date, and time are required' });
     }
 
-    // Find lab
-    const lab = await Lab.findOne({ $or: [{ _id: labId }, { id: labId }] });
+    // Find lab by string id field (not ObjectId)
+    const lab = await Lab.findOne({ id: labId });
     if (!lab) {
       return res.status(404).json({ message: 'Lab not found' });
     }
