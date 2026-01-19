@@ -122,12 +122,20 @@ async function runTests() {
 
   // Test 9: Add Material (with AI)
   if (await testEndpoint('Add Material (AI-powered)', async () => {
+    // First, get the electronics lab to get its ObjectId
+    const { data: labsData } = await axios.get(`${BASE_URL}/labs`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    const electronicsLab = labsData.labs.find(lab => lab.labId === 'electronics-lab');
+    if (!electronicsLab) throw new Error('Electronics lab not found');
+    
     const { data } = await axios.post(
       `${BASE_URL}/materials`,
       {
         name: 'Test Resistor',
         description: '10k ohm carbon film resistor',
         quantity: 100,
+        lab: electronicsLab._id,
         labId: 'electronics-lab'
       },
       { headers: { Authorization: `Bearer ${assistantToken}` } }

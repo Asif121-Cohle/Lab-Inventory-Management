@@ -155,6 +155,7 @@ exports.addMaterial = async (req, res) => {
       description,
       quantity: quantity || 0,
       lab: lab._id,
+      labId: labId,
       category: finalCategory,
       tags: finalTags
     });
