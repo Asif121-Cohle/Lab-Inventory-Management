@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const { swaggerUi, swaggerSpec, swaggerUiOptions } = require('./docs/swagger');
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +14,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
+
+// Swagger JSON endpoint
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI)
@@ -46,6 +56,7 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'Welcome to Lab Inventory Management API',
     version: '1.0.0',
+    documentation: '/api-docs',
     endpoints: {
       auth: '/api/auth',
       labs: '/api/labs',
@@ -78,6 +89,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📡 API available at http://localhost:${PORT}`);
+  console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
   console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
 });
 

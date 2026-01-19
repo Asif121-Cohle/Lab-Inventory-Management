@@ -126,7 +126,7 @@ async function runTests() {
     const { data: labsData } = await axios.get(`${BASE_URL}/labs`, {
       headers: { Authorization: `Bearer ${assistantToken}` }
     });
-    const electronicsLab = labsData.labs.find(lab => lab.labId === 'electronics-lab');
+    const electronicsLab = labsData.labs.find(lab => lab.id === 'electronics-lab');
     if (!electronicsLab) throw new Error('Electronics lab not found');
     
     const { data } = await axios.post(
@@ -197,7 +197,7 @@ async function runTests() {
     if (data.intent) log.info(`Intent: ${data.intent}`);
   })) passed++; else failed++;
 
-  // Test 12: Get Pending Requests
+  // Test 13: Get Pending Requests
   if (await testEndpoint('Get Pending Requests', async () => {
     const { data } = await axios.get(`${BASE_URL}/requests/pending`, {
       headers: { Authorization: `Bearer ${assistantToken}` }
@@ -205,27 +205,217 @@ async function runTests() {
     log.info(`Pending requests: ${data.requests.length}`);
   })) passed++; else failed++;
 
-  // Test 13: Professor Schedule Lab
+  // Test 14: Professor Schedule Lab
   if (await testEndpoint('Professor Schedule Lab', async () => {
+    // Get physics lab ObjectId
+    const { data: labsData } = await axios.get(`${BASE_URL}/labs`, {
+      headers: { Authorization: `Bearer ${professorToken}` }
+    });
+    const physicsLab = labsData.labs.find(lab => lab.id === 'physics-lab');
+    if (!physicsLab) throw new Error('Physics lab not found');
+    
+    // Use a unique future date to avoid conflicts
     const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 7);
+    futureDate.setDate(futureDate.getDate() + Math.floor(Math.random() * 30) + 30); // 30-60 days ahead
     const dateStr = futureDate.toISOString().split('T')[0];
     const { data } = await axios.post(
       `${BASE_URL}/schedules`,
       {
-        labId: 'physics-lab',
+        labId: physicsLab._id,
         date: dateStr,
-        startTime: '14:00',
-        endTime: '16:00',
-        courseName: 'Physics 101',
-        className: 'Section A',
+        startTime: '09:00',
+        endTime: '11:00',
+        courseName: 'Physics 101 - Test',
+        className: 'Test Section',
         expectedStudents: 30,
-        purpose: 'Test lab session'
+        purpose: 'Automated test schedule'
       },
       { headers: { Authorization: `Bearer ${professorToken}` } }
     );
     if (!data.schedule) throw new Error('Schedule not created');
     log.info(`Scheduled: ${data.schedule.lab.name} on ${data.schedule.date}`);
+  })) passed++; else failed++;
+
+  // Test 15: Get Current User (Auth Me)
+  if (await testEndpoint('Get Current User', async () => {
+    const { data } = await axios.get(`${BASE_URL}/auth/me`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    if (!data.user) throw new Error('User not returned');
+    log.info(`User: ${data.user.username} (${data.user.role})`);
+  })) passed++; else failed++;
+
+  // Test 16: Get Lab by ID
+  if (await testEndpoint('Get Lab by ID', async () => {
+    const { data: labsData } = await axios.get(`${BASE_URL}/labs`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    const labId = labsData.labs[0]._id;
+    
+    const { data } = await axios.get(`${BASE_URL}/labs/${labId}`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    if (!data.lab) throw new Error('Lab not returned');
+    log.info(`Lab: ${data.lab.name} (${data.lab.labId})`);
+  })) passed++; else failed++;
+
+  // Test 17: Update Material
+  if (await testEndpoint('Update Material', async () => {
+    const { data: materials } = await axios.get(`${BASE_URL}/materials`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    const materialId = materials.materials[0]._id;
+    
+    const { data } = await axios.put(
+      `${BASE_URL}/materials/${materialId}`,
+      {
+        quantity: materials.materials[0].quantity + 50,
+        minThreshold: 15
+      },
+      { headers: { Authorization: `Bearer ${assistantToken}` } }
+    );
+    if (!data.material) throw new Error('Material not updated');
+    log.info(`Updated: ${data.material.name} - New quantity: ${data.material.quantity}`);
+  })) passed++; else failed++;
+
+  // Test 18: Get My Requests (Student)
+  if (await testEndpoint('Get My Requests (Student)', async () => {
+    const { data } = await axios.get(`${BASE_URL}/requests/my-requests`, {
+      headers: { Authorization: `Bearer ${studentToken}` }
+    });
+    if (!data.requests) throw new Error('Requests not returned');
+    log.info(`Student has ${data.requests.length} requests`);
+  })) passed++; else failed++;
+
+  // Test 19: Approve Request
+  if (await testEndpoint('Approve Request', async () => {
+    const { data: pendingData } = await axios.get(`${BASE_URL}/requests/pending`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    
+    if (pendingData.requests.length === 0) {
+      log.info('No pending requests to approve - SKIPPED');
+      return true;
+    }
+    
+    const requestId = pendingData.requests[0]._id;
+    const { data } = await axios.put(
+      `${BASE_URL}/requests/${requestId}/approve`,
+      {},
+      { headers: { Authorization: `Bearer ${assistantToken}` } }
+    );
+    if (!data.request) throw new Error('Request not approved');
+    log.info(`Approved request for: ${data.request.material?.name || 'material'}`);
+  })) passed++; else failed++;
+
+  // Test 20: Check Schedule Availability
+  if (await testEndpoint('Check Schedule Availability', async () => {
+    // Get physics lab ObjectId
+    const { data: labsData } = await axios.get(`${BASE_URL}/labs`, {
+      headers: { Authorization: `Bearer ${professorToken}` }
+    });
+    const physicsLab = labsData.labs.find(lab => lab.id === 'physics-lab');
+    if (!physicsLab) throw new Error('Physics lab not found');
+    
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 14);
+    const dateStr = futureDate.toISOString().split('T')[0];
+    
+    const { data } = await axios.get(`${BASE_URL}/schedules/check-availability`, {
+      params: {
+        labId: physicsLab._id,
+        date: dateStr,
+        time: '10:00-12:00'
+      },
+      headers: { Authorization: `Bearer ${professorToken}` }
+    });
+    log.info(`Availability: ${data.available ? 'Available' : 'Not Available'}`);
+  })) passed++; else failed++;
+
+  // Test 21: Get My Schedules (Professor)
+  if (await testEndpoint('Get My Schedules (Professor)', async () => {
+    const { data } = await axios.get(`${BASE_URL}/schedules/my-schedules`, {
+      headers: { Authorization: `Bearer ${professorToken}` }
+    });
+    if (!data.schedules) throw new Error('Schedules not returned');
+    log.info(`Professor has ${data.schedules.length} schedules`);
+  })) passed++; else failed++;
+
+  // Test 22: Get All Schedules
+  if (await testEndpoint('Get All Schedules', async () => {
+    const { data } = await axios.get(`${BASE_URL}/schedules`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    if (!data.schedules) throw new Error('Schedules not returned');
+    log.info(`Total schedules: ${data.schedules.length}`);
+  })) passed++; else failed++;
+
+  // Test 23: AI Chat
+  if (await testEndpoint('AI Chat', async () => {
+    const { data } = await axios.post(
+      `${BASE_URL}/chat`,
+      {
+        message: 'What materials are available in the electronics lab?',
+        conversationHistory: []
+      },
+      { 
+        headers: { Authorization: `Bearer ${studentToken}` },
+        timeout: 60000
+      }
+    );
+    if (!data.response) throw new Error('No chat response');
+    log.ai(`Chat response: ${data.response.substring(0, 80)}...`);
+  })) passed++; else failed++;
+
+  // Test 24: Get Chat Suggestions
+  if (await testEndpoint('Get Chat Suggestions', async () => {
+    const { data } = await axios.get(`${BASE_URL}/chat/suggestions`, {
+      headers: { Authorization: `Bearer ${studentToken}` }
+    });
+    if (!data.suggestions || data.suggestions.length === 0) throw new Error('No suggestions returned');
+    log.info(`Got ${data.suggestions.length} chat suggestions`);
+  })) passed++; else failed++;
+
+  // Test 25: Get Analytics Data
+  if (await testEndpoint('Get Analytics Data', async () => {
+    const { data } = await axios.get(`${BASE_URL}/analytics/data`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    if (!data.data || !data.data.materials) throw new Error('Analytics data incomplete');
+    log.info(`Analytics: ${data.data.materials.length} materials, ${data.data.labs.length} labs, ${data.data.requests.length} requests`);
+  })) passed++; else failed++;
+
+  // Test 26: Generate Analytics AI Summary
+  if (await testEndpoint('Generate Analytics AI Summary', async () => {
+    const { data } = await axios.post(
+      `${BASE_URL}/analytics/generate-summary`,
+      {},
+      { 
+        headers: { Authorization: `Bearer ${assistantToken}` },
+        timeout: 60000
+      }
+    );
+    if (!data.summary) throw new Error('No summary generated');
+    log.ai(`Summary: ${data.summary.substring(0, 100)}...`);
+  })) passed++; else failed++;
+
+  // Test 27: Delete Material
+  if (await testEndpoint('Delete Material', async () => {
+    // Find Test Resistor created in Test 9
+    const { data: materials } = await axios.get(`${BASE_URL}/materials`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    const testMaterial = materials.materials.find(m => m.name === 'Test Resistor');
+    
+    if (!testMaterial) {
+      log.info('Test Resistor not found - SKIPPED');
+      return true;
+    }
+    
+    await axios.delete(`${BASE_URL}/materials/${testMaterial._id}`, {
+      headers: { Authorization: `Bearer ${assistantToken}` }
+    });
+    log.info(`Deleted: ${testMaterial.name}`);
   })) passed++; else failed++;
 
   // Summary
