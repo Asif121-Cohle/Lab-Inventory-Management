@@ -10,6 +10,7 @@ import SignupPage from "./pages/signupPage";
 import DashboardPage from "./pages/dashboardPage";
 import LabDetailPage from "./pages/labDetailPage";
 import MaterialDetailPage from "./pages/materialDetailPage";
+import AnalyticsPage from "./pages/analyticsPage";
 
 // Student Pages
 import RequestMaterialPage from "./pages/requestMaterialPage";
@@ -61,6 +62,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MaterialDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <AnalyticsPage />
                 </ProtectedRoute>
               }
             />
